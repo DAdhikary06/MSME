@@ -80,16 +80,7 @@ class SetNewPassword(GenericAPIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         return Response({'message': 'Password reset success'}, status=status.HTTP_200_OK)
-    
-# class LogoutUserView(GenericAPIView):
-#     serializer_class=LogoutUserSerializer
-#     permission_classes = [IsAuthenticated]
 
-#     def post(self, request):
-#         serializer = self.serializer_class(data=request.data)
-#         serializer.is_valid(raise_exception=True)
-#         serializer.save()
-#         return Response({'message': 'Logout success'}, status=status.HTTP_200_OK)
 
 class LogoutUserView(GenericAPIView):
     serializer_class=LogoutUserSerializer
@@ -102,4 +93,27 @@ class LogoutUserView(GenericAPIView):
             return Response({'message': 'Logged out successfully'}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=400)
 
-   
+
+
+
+
+# Google sign in
+
+from django.shortcuts import render
+from rest_framework.generics import GenericAPIView
+from .serializers import GoogleSignInSerializer
+from rest_framework.response import Response
+from rest_framework import status
+from .utils import Google, register_social_user
+from rest_framework.permissions import AllowAny
+from rest_framework.decorators import permission_classes
+
+@permission_classes((AllowAny,))
+class GoogleSignInView(GenericAPIView):
+    serializer_class = GoogleSignInSerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = ((serializer.validated_data)['access_token'])
+        return Response(user, status=status.HTTP_200_OK)

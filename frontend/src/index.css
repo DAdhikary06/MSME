@@ -1,4 +1,4 @@
-:root {
+/* :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
@@ -39,10 +39,10 @@ h1{
 
 button {
   border: 2px solid transparent;
-  /* border-radius: 8px;
+ border-radius: 8px;
   padding: 0.6em 1.2em;
   font-size: 1em;
-  font-weight: 500; */
+  font-weight: 500; 
   cursor: pointer;
   transition: border-color 0.25s;
 }
@@ -65,4 +65,4 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
-}
+} */

@@ -7,8 +7,12 @@ from rest_framework.exceptions import AuthenticationFailed
 
 
 class Google:
+    """Google class to fetch the user info and return it"""
     @staticmethod
     def validate(auth_token):
+        """
+        validate method Queries the Google oAUTH2 api to fetch the user info
+        """
         try:
             id_info = id_token.verify_oauth2_token(auth_token, requests.Request())
             if "account.google.com" in id_info['iss']:
@@ -29,7 +33,8 @@ def register_social_user(provider,email,first_name,last_name):
     user = User.objects.filter(email=email)
     if user.exists():
         if provider == user[0].auth_provider:
-            login_social_user(email=email,password=settings.SOCIAL_AUTH_PASSWORD)
+            result=login_social_user(email=email,password=settings.SOCIAL_AUTH_PASSWORD)
+            return result
         else:
             raise AuthenticationFailed('Please continue your login using '+user[0].auth_provider)
     else:
@@ -43,6 +48,6 @@ def register_social_user(provider,email,first_name,last_name):
         register_user.auth_provider=provider
         register_user.is_verified=True
         register_user.save()
-        login_social_user(email=email,password=settings.SOCIAL_AUTH_PASSWORD)
-
+        result=login_social_user(email=email,password=settings.SOCIAL_AUTH_PASSWORD)
+        return result
 

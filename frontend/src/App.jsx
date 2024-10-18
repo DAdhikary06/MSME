@@ -9,7 +9,8 @@ import {
   VerifyEmail,
   ForgotPassword,
 } from "./components";
-import "./App.css";
+import ResetPassword from "./components/ResetPassword";
+
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
           <Route path="/dashboard" element={<Profile />} />
           <Route path="/otp/verify" element={<VerifyEmail />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/password-reset-confirm/:uid/:token" element={<ResetPassword/>} />
         </Routes>
       </Router>
     </>

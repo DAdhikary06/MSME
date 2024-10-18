@@ -45,7 +45,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework_simplejwt.token_blacklist',
     'account',
-    'social_account',
     'corsheaders',
     'rest_framework',
     'rest_framework_simplejwt',
@@ -85,12 +84,17 @@ WSGI_APPLICATION = 'django_rest_auth.wsgi.application'
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     'http://localhost:3000',
+    'http://localhost:8000',
 ]
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:3000',
     '/http://localhost:5173',
     
 ]
+
+CORS_ALLOW_CREDENTIALS = True
+
+
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
@@ -189,3 +193,5 @@ GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
 GOOGLE_CLIENT_SECRET = os.getenv('GOOGLE_CLIENT_SECRET')
 SOCIAL_AUTH_PASSWORD = os.getenv('SOCIAL_AUTH_PASSWORD')
 
+BASE_APP_URL = "http://localhost:3000"
+BASE_API_URL = "http://localhost:8000"

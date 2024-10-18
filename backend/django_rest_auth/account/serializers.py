@@ -78,10 +78,12 @@ class PasswordResetRequestSerializer(serializers.Serializer):
             uidb64=urlsafe_base64_encode(smart_bytes(user.id))
             token=PasswordResetTokenGenerator().make_token(user)
             request=self.context.get('request')
-            site_domain=get_current_site(request).domain
+            # site_domain=get_current_site(request).domain
+            site_domain = 'localhost:5173' 
             relative_link=reverse('password-reset-confirm', kwargs={'uidb64':uidb64, 'token':token})
+            relative_link = relative_link.replace('account/', '', 1)  # Update the relative_link to remove the 'account/' prefix
             abslink = f"http://{site_domain}{relative_link}"
-            email_body=f"Hi user, click on the link below to reset your password.\n {abslink}"
+            email_body=f"Hi user, click on the link below to reset your password.\n{abslink}"
             data = {
                 'email_body': email_body,
                 'to_email': user.email,
@@ -120,36 +122,53 @@ class SetNewPasswordSerializer(serializers.Serializer):
             raise AuthenticationFailed('The reset link is invalid', 401)
         
 
-# class LogoutUserSerializer(serializers.Serializer):
-#     refresh_token = serializers.CharField()
-#     default_error_messages = {
-#         'bad_token': ('Token is invalid or expired')
-#     }
-
-
-#     def validate(self, attrs):
-#         self.token = attrs.get('refresh_token')
-#         return attrs
-#     def save(self, **kwargs):
-#         try:
-#             RefreshToken(self.token).blacklist()
-#         except TokenError:
-#             return self.fail('bad_token')
-
 class LogoutUserSerializer(serializers.Serializer):
     refresh_token = serializers.CharField()
     default_error_messages = {
         'bad_token': ('Token is invalid or expired')
     }
 
+
     def validate(self, attrs):
         self.token = attrs.get('refresh_token')
-        if not self.context['request'].user.is_authenticated:
-            raise serializers.ValidationError('Authentication credentials were not provided')
         return attrs
-
     def save(self, **kwargs):
         try:
             RefreshToken(self.token).blacklist()
         except TokenError:
             return self.fail('bad_token')
+
+
+
+
+# Google sign in
+
+from rest_framework import serializers
+from .utils import Google, register_social_user
+from django.conf import settings
+from rest_framework.exceptions import AuthenticationFailed
+class GoogleSignInSerializer(serializers.Serializer):
+    access_token = serializers.CharField()
+
+    def validate(self, data):
+        access_token = data.get('access_token')
+        google_user_data = Google.validate(access_token)
+        try:
+            google_user_data['sub']
+        except:
+            raise serializers.ValidationError('Invalid token')
+        print(google_user_data['aud'])
+
+        if google_user_data['aud'] != settings.GOOGLE_CLIENT_ID:
+            raise AuthenticationFailed(detail='Could not verify user')
+        
+        user_id = google_user_data['sub']
+        email = google_user_data['email']
+        first_name = google_user_data['given_name']
+        last_name = google_user_data['family_name']
+        provider = 'google'
+
+        return register_social_user(provider=provider, user_id=user_id, email=email, first_name=first_name, last_name=last_name)
+
+
+
